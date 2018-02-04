@@ -1,0 +1,9 @@
+github:
+  client:
+    clientId: ${GITHUB_OAUTH_APP_ID}
+    clientSecret: ${GITHUB_OAUTH_APP_PW}
+    accessTokenUri: https://github.com/login/oauth/access_token
+    userAuthorizationUri: https://github.com/login/oauth/authorize
+    clientAuthenticationScheme: form
+  resource:
+    userInfoUri: https://api.github.com/user
