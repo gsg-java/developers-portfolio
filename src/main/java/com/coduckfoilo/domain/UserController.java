@@ -1,7 +1,10 @@
 package com.coduckfoilo.domain;
 
+import com.coduckfoilo.domain.project.Project;
 import com.coduckfoilo.domain.user.User;
 import com.coduckfoilo.domain.user.UserRepository;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -26,25 +29,39 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/")
 public class UserController {
 
     @Autowired
     private UserRepository userRepository;
 
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
-    public ResponseEntity<Map> getUser(@PathVariable("name") String name) {
+    public ResponseEntity<String> getUser(@PathVariable("name") String name) {
         // Git Hub API를 사용하기 위한 작업, Util class 로 대체할 예정
         RestTemplate restTemplate = new RestTemplate();
-
-        SecurityContextHolder.getContext().getAuthentication().getDetails();
         String token = ((OAuth2AuthenticationDetails)SecurityContextHolder.getContext().getAuthentication().getDetails()).getTokenValue();
 
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.set(HttpHeaders.AUTHORIZATION, "token " + token);
         HttpEntity httpEntity = new HttpEntity(headers);
 
-        ResponseEntity responseEntity = restTemplate.getForEntity("https://api.github.com/users/" + name, Map.class, httpEntity);
-        return responseEntity;
+        ResponseEntity response = restTemplate.getForEntity("https://api.github.com/users/" + name, String.class, httpEntity);
+
+        return response;
     }
+//
+//    @RequestMapping(value = "/{name}/projects", method = RequestMethod.GET)
+//    public ResponseEntity<String> getProjects(@PathVariable("name") String name) {
+//        // Git Hub API를 사용하기 위한 작업, Util class 로 대체할 예정
+//        RestTemplate restTemplate = new RestTemplate();
+//        String token = ((OAuth2AuthenticationDetails)SecurityContextHolder.getContext().getAuthentication().getDetails()).getTokenValue();
+//
+//        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+//        headers.set(HttpHeaders.AUTHORIZATION, "token " + token);
+//        HttpEntity httpEntity = new HttpEntity(headers);
+//
+//        ResponseEntity response = restTemplate.getForEntity("https://api.github.com/users/" + name + "/repos", String.class, httpEntity);
+//
+//        return response;
+//    }
 }
