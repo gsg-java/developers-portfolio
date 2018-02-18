@@ -54,7 +54,7 @@ const config = {
                 loader: 'url-loader',
                 options: {
                     publicPath : '/static/',
-                    name : 'pc/fonts/[name].[ext]',
+                    name : 'fonts/[name].[ext]',
                     limit : 1
                 }
             }
