@@ -23,6 +23,40 @@ const config = {
                         ]
                     }
                 }]
+            },
+            {
+                test: /\.css$/,
+                loader: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader",
+                })
+            },
+            {
+                test: /\.(jpe?g|png|gif|svg)$/,
+                loader: 'url-loader',
+                options: {
+                    publicPath : '/static/',
+                    name : 'images/[name].[ext]',
+                    limit : 1
+                }
+            },
+            {
+                test: /\.ico$/,
+                loader: 'file-loader',
+                options: {
+                    publicPath : '/static/',
+                    name : '[name].[ext]',
+                    limit : 1
+                }
+            },
+            {
+                test: /\.(eot|svg|ttf|woff|woff2)$/,
+                loader: 'url-loader',
+                options: {
+                    publicPath : '/static/',
+                    name : 'pc/fonts/[name].[ext]',
+                    limit : 1
+                }
             }
         ]
     },
