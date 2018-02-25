@@ -5,6 +5,13 @@ import com.coduckfoilo.domain.user.User;
 import com.coduckfoilo.domain.user.UserRepository;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.GitHubResponse;
+import org.eclipse.egit.github.core.service.GitHubService;
+import org.eclipse.egit.github.core.service.RepositoryService;
+import org.eclipse.egit.github.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import sun.reflect.annotation.ExceptionProxy;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,32 +45,26 @@ public class UserController {
     private UserRepository userRepository;
 
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
-    public ResponseEntity<String> getUser(@PathVariable("name") String name) {
+    public String getUser(@PathVariable("name") String name) {
         // Git Hub API를 사용하기 위한 작업, Util class 로 대체할 예정
-        RestTemplate restTemplate = new RestTemplate();
         String token = ((OAuth2AuthenticationDetails)SecurityContextHolder.getContext().getAuthentication().getDetails()).getTokenValue();
 
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.set(HttpHeaders.AUTHORIZATION, "token " + token);
-        HttpEntity httpEntity = new HttpEntity(headers);
+        try {
+            GitHubClient gitHubClient = new GitHubClient();
+            gitHubClient.setOAuth2Token(token);
+            UserService userService = new UserService(gitHubClient);
 
-        ResponseEntity response = restTemplate.getForEntity("https://api.github.com/users/" + name, String.class, httpEntity);
+            String email = userService.getUser(name).getEmail();
+            int id = userService.getUser(name).getId();
+            String gitHubName = userService.getUser(name).getName();
 
-        return response;
+            return email + " " + id + " " + gitHubName;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
-//
-//    @RequestMapping(value = "/{name}/projects", method = RequestMethod.GET)
-//    public ResponseEntity<String> getProjects(@PathVariable("name") String name) {
-//        // Git Hub API를 사용하기 위한 작업, Util class 로 대체할 예정
-//        RestTemplate restTemplate = new RestTemplate();
-//        String token = ((OAuth2AuthenticationDetails)SecurityContextHolder.getContext().getAuthentication().getDetails()).getTokenValue();
-//
-//        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-//        headers.set(HttpHeaders.AUTHORIZATION, "token " + token);
-//        HttpEntity httpEntity = new HttpEntity(headers);
-//
-//        ResponseEntity response = restTemplate.getForEntity("https://api.github.com/users/" + name + "/repos", String.class, httpEntity);
-//
-//        return response;
-//    }
+
 }
